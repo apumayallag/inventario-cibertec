@@ -1,0 +1,10 @@
+@import url('./main-layout.css');
+@import url('./views/productos-view.css');
+@import url('./views/proveedores-view.css');
+@import url('./views/categorias-view.css');
+@import url('./views/movivmientos-view.css');    html {
+      --lumo-line-height-m: 1.4;
+      --lumo-line-height-s: 1.2;
+      --lumo-line-height-xs: 1.1;
+
+    }
