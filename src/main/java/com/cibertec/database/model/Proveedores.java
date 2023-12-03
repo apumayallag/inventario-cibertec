@@ -36,4 +36,9 @@ public class Proveedores {
 
     @Column(name = "direccion")
     private String direccion;
+
+    @Override
+    public String toString() {
+        return nombre != null && !nombre.isEmpty() ? nombre+ " " + apellido : razonSocial;
+    }
 }

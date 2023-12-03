@@ -1,5 +1,6 @@
 @import url('./main-layout.css');
 @import url('./views/productos-view.css');
+@import url('./views/cliente-view.css');
 @import url('./views/proveedores-view.css');
 @import url('./views/categorias-view.css');
 @import url('./views/movivmientos-view.css');    html {

@@ -7,23 +7,29 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "categoria")
+@Table(name = "cliente")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Categoria {
+public class Cliente {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre")
-    private String nombre;
+    @Column(name = "nombres")
+    private String nombres;
+
+    @Column(name = "apellidos")
+    private String apellidos;
+
+    @Column(name = "nro_documento")
+    private String nroDocumento;
 
     @Override
     public String toString() {
-        return nombre;
+        return nombres+ " " + apellidos;
     }
 }

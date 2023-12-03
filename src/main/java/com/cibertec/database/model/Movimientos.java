@@ -6,24 +6,31 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
-@Table(name = "categoria")
+@Table(name = "movimiento")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Categoria {
+public class Movimientos {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre")
-    private String nombre;
+    @ManyToOne
+    private Producto producto;
 
-    @Override
-    public String toString() {
-        return nombre;
-    }
+    @ManyToOne
+    private Proveedores proveedores;
+
+    private Double cantidad;
+
+    private Double costo;
+
+    private Date fecha;
+
 }

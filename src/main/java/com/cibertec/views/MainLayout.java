@@ -13,9 +13,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import org.vaadin.lineawesome.LineAwesomeIcon;
 
-/**
- * The main view is a top-level placeholder for other views.
- */
 public class MainLayout extends AppLayout {
 
     private H2 viewTitle;
@@ -49,11 +46,12 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-//        nav.addItem(new SideNavItem("Productos", ProductosView.class, LineAwesomeIcon.SHOPPING_BASKET_SOLID.create()));
+        nav.addItem(new SideNavItem("Clientes", ClienteView.class, LineAwesomeIcon.SHOPPING_BASKET_SOLID.create()));
         nav.addItem(new SideNavItem("Proveedores", ProveedoresView.class, LineAwesomeIcon.PERSON_BOOTH_SOLID.create()));
         nav.addItem(new SideNavItem("Categorias", CategoriasView.class, LineAwesomeIcon.CHESS_BOARD_SOLID.create()));
-//        nav.addItem(new SideNavItem("Movivmientos", MovivmientosView.class, LineAwesomeIcon.TRUCK_MOVING_SOLID.create()));
-
+        nav.addItem(new SideNavItem("Productos", ProductoView.class, LineAwesomeIcon.TRUCK_MOVING_SOLID.create()));
+        nav.addItem(new SideNavItem("Movimientos", MovimientosView.class, LineAwesomeIcon.SHOPPING_BASKET_SOLID.create()));
+        nav.addItem(new SideNavItem("Ventas", VentasView.class, LineAwesomeIcon.SHOPPING_BASKET_SOLID.create()));
 
         return nav;
     }

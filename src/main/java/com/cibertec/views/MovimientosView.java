@@ -1,6 +1,10 @@
 package com.cibertec.views;
 
+import com.cibertec.database.manager.MovimientoManager;
+import com.cibertec.database.manager.ProductoManager;
 import com.cibertec.database.manager.ProveedoresManager;
+import com.cibertec.database.model.Movimientos;
+import com.cibertec.database.model.Producto;
 import com.cibertec.database.model.Proveedores;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
@@ -13,11 +17,10 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.Notification.Position;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.splitlayout.SplitLayout;
-import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -28,39 +31,37 @@ import com.vaadin.flow.spring.data.VaadinSpringDataHelpers;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-@PageTitle("Proveedores")
-@Route(value = "proveedores/:proveedorID?/:action?(edit)", layout = MainLayout.class)
+@PageTitle("Movimiento")
+@Route(value = "movimiento", layout = MainLayout.class)
 @Uses(Icon.class)
-public class ProveedoresView extends Div implements BeforeEnterObserver {
+public class MovimientosView extends Div implements BeforeEnterObserver {
 
-    private final String PROVEEDOR_ID = "proveedorID";
-    private final String PROVEEDOR_EDIT_ROUTE_TEMPLATE = "proveedores/%s/edit";
+    private final String MOVIMIENTO_ID = "movimientoID";
 
-    private final Grid<Proveedores> grid = new Grid<>(Proveedores.class, false);
-
-    private ComboBox<String> tipoDocumento;
-    private TextField nroDocumento;
-    private TextField nombre;
-    private TextField apellido;
-    private TextField razonSocial;
-    private TextField direccion;
+    private final Grid<Movimientos> grid = new Grid<>(Movimientos.class, false);
+    private ComboBox<Producto> producto;
+    private ComboBox<Proveedores> proveedores;
+    private NumberField cantidad;
+    private NumberField costo;
 
     private final Button cancel = new Button("Cancelar");
     private final Button save = new Button("Guardar");
 
-    private final BeanValidationBinder<Proveedores> binder;
+    private final BeanValidationBinder<Movimientos> binder;
 
-    private Proveedores proveedoresBean;
+    private Movimientos movimientosBean;
 
+    private final MovimientoManager movimientoManager;
+    private final ProductoManager productoManager;
     private final ProveedoresManager proveedoresManager;
 
-    public ProveedoresView(ProveedoresManager proveedoresManager) {
+    public MovimientosView(MovimientoManager movimientoManager, ProductoManager productoManager, ProveedoresManager proveedoresManager) {
+        this.movimientoManager = movimientoManager;
+        this.productoManager = productoManager;
         this.proveedoresManager = proveedoresManager;
-        addClassNames("proveedores-view");
+        addClassNames("productos-view");
 
         // Create UI
         SplitLayout splitLayout = new SplitLayout();
@@ -71,30 +72,21 @@ public class ProveedoresView extends Div implements BeforeEnterObserver {
         add(splitLayout);
 
         // Configure Grid
-        grid.addColumn("tipoDocumento").setHeader("Tipo Documento").setAutoWidth(true);
-        grid.addColumn("nroDocumento").setHeader("Nro.").setAutoWidth(true);
-        grid.addColumn("nombre").setHeader("Nombres").setAutoWidth(true);
-        grid.addColumn("apellido").setHeader("Apellidos").setAutoWidth(true);
-        grid.addColumn("razonSocial").setHeader("Razon Social").setAutoWidth(true);
-        grid.addColumn("direccion").setHeader("Direccion").setAutoWidth(true);
+        grid.addColumn("id").setHeader("Id").setAutoWidth(true);
+        grid.addColumn("producto.nombre").setHeader("Nombre").setAutoWidth(true);
+        grid.addColumn("proveedores").setHeader("Proveedor").setAutoWidth(true);
+        grid.addColumn("cantidad").setHeader("Cantidad").setAutoWidth(true);
+        grid.addColumn("costo").setHeader("Costo").setAutoWidth(true);
+        grid.addColumn("fecha").setHeader("Fecha").setAutoWidth(true);
 
-        grid.setItems(query -> proveedoresManager.getAll(
-                PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
+        grid.setItems(query -> movimientoManager.getAll(
+                        PageRequest.of(query.getPage(), query.getPageSize(), VaadinSpringDataHelpers.toSpringDataSort(query)))
                 .stream());
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
-        // when a row is selected or deselected, populate form
-        grid.asSingleSelect().addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                UI.getCurrent().navigate(String.format(PROVEEDOR_EDIT_ROUTE_TEMPLATE, event.getValue().getId()));
-            } else {
-                clearForm();
-                UI.getCurrent().navigate(ProveedoresView.class);
-            }
-        });
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
 
         // Configure Form
-        binder = new BeanValidationBinder<>(Proveedores.class);
+        binder = new BeanValidationBinder<>(Movimientos.class);
 
         // Bind fields. This is where you'd define e.g. validation rules
 
@@ -107,19 +99,19 @@ public class ProveedoresView extends Div implements BeforeEnterObserver {
 
         save.addClickListener(e -> {
             try {
-                if (this.proveedoresBean == null) {
-                    this.proveedoresBean = new Proveedores();
+                if (this.movimientosBean == null) {
+                    this.movimientosBean = new Movimientos();
                 }
-                binder.writeBean(this.proveedoresBean);
-                proveedoresManager.save(this.proveedoresBean);
+                binder.writeBean(this.movimientosBean);
+                movimientoManager.save(this.movimientosBean);
                 clearForm();
                 refreshGrid();
                 Notification.show("Data updated");
-                UI.getCurrent().navigate(ProveedoresView.class);
+                UI.getCurrent().navigate(MovimientosView.class);
             } catch (ObjectOptimisticLockingFailureException exception) {
                 Notification n = Notification.show(
                         "Error updating the data. Somebody else has updated the record while you were making changes.");
-                n.setPosition(Position.MIDDLE);
+                n.setPosition(Notification.Position.MIDDLE);
                 n.addThemeVariants(NotificationVariant.LUMO_ERROR);
             } catch (ValidationException validationException) {
                 Notification.show("Failed to update the data. Check again that all values are valid");
@@ -129,19 +121,19 @@ public class ProveedoresView extends Div implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Optional<Long> samplePersonId = event.getRouteParameters().get(PROVEEDOR_ID).map(Long::parseLong);
+        Optional<Long> samplePersonId = event.getRouteParameters().get(MOVIMIENTO_ID).map(Long::parseLong);
         if (samplePersonId.isPresent()) {
-            Optional<Proveedores> samplePersonFromBackend = proveedoresManager.getById(samplePersonId.get());
+            Optional<Movimientos> samplePersonFromBackend = movimientoManager.getById(samplePersonId.get());
             if (samplePersonFromBackend.isPresent()) {
                 populateForm(samplePersonFromBackend.get());
+                producto.setValue(samplePersonFromBackend.get().getProducto());
+                proveedores.setValue(samplePersonFromBackend.get().getProveedores());
             } else {
                 Notification.show(
                         String.format("The requested samplePerson was not found, ID = %s", samplePersonId.get()), 3000,
                         Notification.Position.BOTTOM_START);
-                // when a row is selected but the data is no longer available,
-                // refresh grid
                 refreshGrid();
-                event.forwardTo(ProveedoresView.class);
+                event.forwardTo(MovimientosView.class);
             }
         }
     }
@@ -155,29 +147,14 @@ public class ProveedoresView extends Div implements BeforeEnterObserver {
         editorLayoutDiv.add(editorDiv);
 
         FormLayout formLayout = new FormLayout();
-        List<String> tipos = new ArrayList<>();
-        tipos.add("DNI");
-        tipos.add("RUC");
-        tipoDocumento = new ComboBox<>("Tipo Documento");
-        tipoDocumento.setItems(tipos);
-        nroDocumento = new TextField("Nro Documento");
-        nombre = new TextField("Nombre");
-        apellido = new TextField("Apellido");
-        razonSocial = new TextField("Razon Social");
-        direccion = new TextField("Direccion");
-        tipoDocumento.addValueChangeListener(e -> {
-            nombre.setVisible(false);
-            apellido.setVisible(false);
-            razonSocial.setVisible(false);
-            if ("DNI".equalsIgnoreCase(e.getValue())){
-                nombre.setVisible(true);
-                apellido.setVisible(true);
-            }
-            if ("RUC".equalsIgnoreCase(e.getValue())){
-                razonSocial.setVisible(true);
-            }
-        });
-        formLayout.add(tipoDocumento, nroDocumento, nombre, apellido, razonSocial, direccion);
+        cantidad = new NumberField("Cantidad");
+        costo = new NumberField("Costo");
+        producto = new ComboBox<>("Producto");
+        producto.setItems(productoManager.getAll());
+        proveedores = new ComboBox<>("Proveedores");
+        proveedores.setItems(proveedoresManager.getAll());
+
+        formLayout.add(cantidad, costo, producto, proveedores);
 
         editorDiv.add(formLayout);
         createButtonLayout(editorLayoutDiv);
@@ -210,9 +187,9 @@ public class ProveedoresView extends Div implements BeforeEnterObserver {
         populateForm(null);
     }
 
-    private void populateForm(Proveedores value) {
-        this.proveedoresBean = value;
-        binder.readBean(this.proveedoresBean);
+    private void populateForm(Movimientos value) {
+        this.movimientosBean = value;
+        binder.readBean(this.movimientosBean);
 
     }
 }
