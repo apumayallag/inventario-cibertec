@@ -1,4 +1,4 @@
-# Inventario
+# Farmacia
 
 
 
@@ -6,6 +6,6 @@
 ## Integrantes
 
 - Alexis David Pumayalla Giove
-- Yarilenka Geraldine Benites Mozo
+- Roy David Jaimes Cerna
 - Alexis Roy Guarniz Colqui
-- Marcos Nolasco Hurtado
+- Johan Diego Gatica Arevalo
