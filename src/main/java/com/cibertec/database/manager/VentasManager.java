@@ -22,6 +22,7 @@ public class VentasManager {
     public Ventas save(Ventas ventas){
         Producto producto = ventas.getProducto();
         producto.setStock(producto.getStock() - ventas.getCantidad());
+        ventas.setPrecioTotal(ventas.getCantidad() * ventas.getPrecioUnidad());
         ventas = ventasRepository.save(ventas);
 
         productoRepository.save(producto);

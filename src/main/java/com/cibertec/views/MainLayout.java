@@ -46,7 +46,7 @@ public class MainLayout extends AppLayout {
     private SideNav createNavigation() {
         SideNav nav = new SideNav();
 
-        nav.addItem(new SideNavItem("Clientes", ClienteView.class, LineAwesomeIcon.SHOPPING_BASKET_SOLID.create()));
+        nav.addItem(new SideNavItem("Clientes", ClienteView.class, LineAwesomeIcon.PERSON_BOOTH_SOLID.create()));
         nav.addItem(new SideNavItem("Proveedores", ProveedoresView.class, LineAwesomeIcon.PERSON_BOOTH_SOLID.create()));
         nav.addItem(new SideNavItem("Categorias", CategoriasView.class, LineAwesomeIcon.CHESS_BOARD_SOLID.create()));
         nav.addItem(new SideNavItem("Productos", ProductoView.class, LineAwesomeIcon.TRUCK_MOVING_SOLID.create()));
